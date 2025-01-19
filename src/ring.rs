@@ -1,6 +1,6 @@
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct RingBuffer {
-    buf: Vec<bool>,
+    pub buf: Vec<bool>,
     start: usize,
     end: usize,
 }

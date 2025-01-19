@@ -1,3 +1,4 @@
+//#![feature(variant_count)]
 use std::io::{stdin, stdout, Write};
 use std::sync::{mpsc::channel, Arc, RwLock};
 use std::thread::sleep;
@@ -8,6 +9,11 @@ use termion::raw::IntoRawMode;
 
 mod morse;
 mod ring;
+pub mod menu;
+pub mod code_table;
+pub mod tui;
+pub mod app;
+pub mod decoder;
 
 use morse::{decode_symbols, encode_character};
 use ring::RingBuffer;
@@ -210,93 +216,4 @@ pub fn run_decoder<W: Write + Send>(stdout: &mut MouseTerminal<W>, width: u16, h
             }
         });
     });
-}
-
-pub enum Choice {
-    DecodeMode,
-    Shutdown,
-    CodeTable,
-    EOF
-}
-
-const DEC_SELECT_MESSAGE: &str = "Press d to enter decode mode.";
-const TABLE_SELECT_MESSAGE: &str = "Press t to view morse code table.";
-const EXIT_SELECT_MESSAGE: &str = "Press q to exit.";
-
-pub fn run_menu<W: Write>(terminal: &mut MouseTerminal<W>, width: u16, height: u16) -> Choice {
-    let stdin = stdin();
-
-    write!(
-        terminal,
-        "{}",
-        termion::clear::All,
-    ).unwrap();
-    write!(
-        terminal,
-        "{}{}",
-        termion::cursor::Goto((width / 2) - (DEC_SELECT_MESSAGE.len() as u16) / 2, height / 2),
-        DEC_SELECT_MESSAGE,
-    ).unwrap();
-    write!(
-        terminal,
-        "{}{}",
-        termion::cursor::Goto((width / 2) - (TABLE_SELECT_MESSAGE.len() as u16) / 2, height / 2+1),
-        TABLE_SELECT_MESSAGE,
-    ).unwrap();
-    write!(
-        terminal,
-        "{}{}",
-        termion::cursor::Goto((width / 2) - (EXIT_SELECT_MESSAGE.len() as u16) / 2, (height / 2) + 2),
-        EXIT_SELECT_MESSAGE,
-    ).unwrap();
-    terminal.flush().unwrap();
-
-    for c in stdin.events() {
-        let evt = c.unwrap();
-        match evt {
-            Event::Key(Key::Char('d')) => {
-                return Choice::DecodeMode;
-            }
-            Event::Key(Key::Char('t')) => {
-                return Choice::CodeTable;
-            }
-            Event::Key(Key::Char('q')) => {
-                return Choice::Shutdown;
-            }
-            _ => {}
-        }
-    }
-    Choice::EOF
-}
-
-pub fn run_code_table<W: Write>(terminal: &mut MouseTerminal<W>, width: u16, height: u16) {
-    let stdin = stdin();
-    write!(
-        terminal,
-        "{}",
-        termion::clear::All,
-    ).unwrap();
-    for (i, (c1, c2)) in ('a'..='m').zip('n'..='z').enumerate() {
-        let symbols1 = encode_character(c1).unwrap();
-        let symbols2 = encode_character(c2).unwrap();
-        write!(
-            terminal,
-            "{}{} {}{} {}",
-            termion::cursor::Goto(1, i as u16 + 1),
-            c1,
-            symbols1,
-            c2,
-            symbols2,
-        ).unwrap();
-    }
-    terminal.flush().unwrap();
-    for c in stdin.events() {
-        let evt = c.unwrap();
-        match evt {
-            Event::Key(Key::Char('q')) => {
-                return;
-            }
-            _ => {}
-        }
-    }
 }
