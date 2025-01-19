@@ -1,5 +1,3 @@
-use crate::ring::RingBuffer;
-
 #[derive(Debug)]
 pub enum MorseSymbol {
     Dit,
@@ -15,10 +13,10 @@ impl std::fmt::Display for EndodedChar {
                 MorseSymbol::Dit => "•",
                 MorseSymbol::Dah => "—",
             };
-            write!(f, "{} ", c); 
+            write!(f, "{} ", c)?; 
         }
         for _ in 0..(5-self.0.len()) {
-            write!(f, "  "); 
+            write!(f, "  ")?; 
         }
         Ok(())
     }

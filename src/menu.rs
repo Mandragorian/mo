@@ -1,14 +1,10 @@
-use std::{default, io::Result};
+use std::io::Result;
 use ratatui::{
     prelude::*,
     widgets::{Table, TableState, Row, Widget, StatefulWidget},
     layout::Constraint,
 };
 use crossterm::event::{self, Event, KeyEventKind, KeyCode, KeyEvent};
-
-const DEC_SELECT_MESSAGE: &str = "Press d to enter decode mode.";
-const TABLE_SELECT_MESSAGE: &str = "Press t to view morse code table.";
-const EXIT_SELECT_MESSAGE: &str = "Press q to exit.";
 
 macro_rules! choice {
     ( $( $x:ident; $s:literal ),* ) => {
@@ -77,7 +73,7 @@ impl Menu {
     }
 
     pub fn run(&mut self, terminal: &mut crate::tui::Tui) -> Result<Choice> {
-        terminal.clear();
+        terminal.clear().expect("couldn't clear terminal");
         while !self.exit {
             terminal.draw(|frame| self.render_frame(frame))?;
             self.handle_events()?;
@@ -113,48 +109,3 @@ impl Menu {
         }
     }
 }
-
-// pub fn run_menu<W: Write>(terminal: &mut MouseTerminal<W>, width: u16, height: u16) -> Choice {
-//     let stdin = stdin();
-//     write!(
-//         terminal,
-//         "{}",
-//         termion::clear::All,
-//     ).unwrap();
-//     write!(
-//         terminal,
-//         "{}{}",
-//         termion::cursor::Goto((width / 2) - (DEC_SELECT_MESSAGE.len() as u16) / 2, height / 2),
-//         DEC_SELECT_MESSAGE,
-//     ).unwrap();
-//     write!(
-//         terminal,
-//         "{}{}",
-//         termion::cursor::Goto((width / 2) - (TABLE_SELECT_MESSAGE.len() as u16) / 2, height / 2+1),
-//         TABLE_SELECT_MESSAGE,
-//     ).unwrap();
-//     write!(
-//         terminal,
-//         "{}{}",
-//         termion::cursor::Goto((width / 2) - (EXIT_SELECT_MESSAGE.len() as u16) / 2, (height / 2) + 2),
-//         EXIT_SELECT_MESSAGE,
-//     ).unwrap();
-//     terminal.flush().unwrap();
-
-//     for c in stdin.events() {
-//         let evt = c.unwrap();
-//         match evt {
-//             Event::Key(Key::Char('d')) => {
-//                 return Choice::DecodeMode;
-//             }
-//             Event::Key(Key::Char('t')) => {
-//                 return Choice::CodeTable;
-//             }
-//             Event::Key(Key::Char('q')) => {
-//                 return Choice::Shutdown;
-//             }
-//             _ => {}
-//         }
-//     }
-//     Choice::EOF
-// }

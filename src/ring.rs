@@ -32,17 +32,6 @@ impl RingBuffer {
             cur: self.start,
         }
     }
-
-    pub fn window(&self, size: usize, start: usize) -> RingBufferWindowIter {
-        assert!(self.len() >= size);
-        let cur = (self.start + start + 1) % self.len();
-        let end = (cur + size) % self.len();
-        RingBufferWindowIter {
-            buf: self,
-            cur,
-            end,
-        }
-    }
 }
 
 impl std::ops::Index<usize> for RingBuffer {
@@ -59,7 +48,7 @@ pub struct RingBufferWindowIter<'a> {
     end: usize,
 }
 
-impl<'a> Iterator for RingBufferWindowIter<'a> {
+impl Iterator for RingBufferWindowIter<'_> {
     type Item = bool;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -78,7 +67,7 @@ pub struct RingBufferIter<'a> {
     cur: usize,
 }
 
-impl<'a> Iterator for RingBufferIter<'a> {
+impl Iterator for RingBufferIter<'_> {
     type Item = bool;
 
     fn next(&mut self) -> Option<Self::Item> {

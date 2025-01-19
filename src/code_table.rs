@@ -1,7 +1,7 @@
-use std::{default, io::Result};
+use std::io::Result;
 use ratatui::{
     prelude::*,
-    widgets::{Table as RatatuiTable, TableState, Row, Widget, StatefulWidget},
+    widgets::{Table as RatatuiTable, Row, Widget},
     layout::Constraint,
 };
 use crossterm::event::{self, Event, KeyEventKind, KeyCode, KeyEvent};
@@ -15,12 +15,10 @@ impl Widget for &Table {
     fn render(self, area: Rect, buf: &mut Buffer)
         where Self: Sized 
     {
-        let rows = [
-            Row::new(["Option 1"]), Row::new(["Option 2"]), Row::new(["Option 3"])];
         let mut rows = vec![];
-        for (i, (c1, c2)) in ('a'..='m').zip('n'..='z').enumerate() {
-            let symbols1 = crate::encode_character(c1).unwrap();
-            let symbols2 = crate::encode_character(c2).unwrap();
+        for (c1, c2) in ('a'..='m').zip('n'..='z') {
+            let symbols1 = crate::morse::encode_character(c1).unwrap();
+            let symbols2 = crate::morse::encode_character(c2).unwrap();
             rows.push(Row::new([format!("{}", c1), format!("{}", symbols1), c2.to_string(), format!("{}", symbols2)]));
         }
         let widths = [Constraint::Length(10), Constraint::Length(20), Constraint::Length(10), Constraint::Length(20)];
@@ -35,7 +33,7 @@ impl Table {
     }
 
     pub fn run(&mut self, terminal: &mut crate::tui::Tui) -> Result<()> {
-        terminal.clear();
+        terminal.clear().expect("could not clear terminal");
         while !self.exit {
             terminal.draw(|frame| self.render_frame(frame))?;
             self.handle_events()?;
@@ -60,11 +58,8 @@ impl Table {
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
-        match key_event.code {
-            KeyCode::Char('q') => {
-                self.exit = true
-            }
-            _ => {}
+        if let KeyCode::Char('q') = key_event.code {
+            self.exit = true;
         }
     }
 }

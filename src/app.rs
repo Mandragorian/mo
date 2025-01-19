@@ -1,14 +1,9 @@
 use std::io::Result;
-use ratatui::{
-    prelude::*,
-    widgets::{block::*, *},
-    symbols::border,
-};
-use crossterm::event::{self, Event, KeyEventKind, KeyCode, KeyEvent};
+use ratatui::prelude::*;
 
 #[derive(Debug, Default)]
 pub struct App {
-    counter: u8,
+    //counter: u8,
     menu: crate::menu::Menu,
     table: crate::code_table::Table,
     decoder: crate::decoder::Decoder,
@@ -32,7 +27,6 @@ impl App {
                     crate::menu::Choice::DecodeMode => {self.decoder.run(terminal)?;}
                     crate::menu::Choice::CodeTable => {self.table.run(terminal)?;}
                     crate::menu::Choice::Shutdown => return Ok(()),
-                    _ => {},
             };
         }
     }
