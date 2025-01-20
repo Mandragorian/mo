@@ -48,7 +48,7 @@ impl Widget for &Decoder {
 
         let lock: std::sync::RwLockReadGuard<State> = self.state.read().unwrap();
         let spark_area = Rect::new(0, 8, buf.area().width as u16, 3).offset(offset);
-        let data: Vec<_> = lock.buf.iter().map(|dp: bool| if dp {1u64} else { 0u64}).collect();
+        let data: Vec<_> = lock.buf.iter().map(|dp| if dp {1u64} else { 0u64}).collect();
         let text = lock.message.clone();
         drop(lock);
 
